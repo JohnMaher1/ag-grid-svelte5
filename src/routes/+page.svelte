@@ -4,7 +4,7 @@
 	import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 	import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 	import { themeQuartz } from '@ag-grid-community/theming';
-	import { TestComp } from './Test.svelte';
+	import { TestComp, type TestCompContext, type TestCustomCellData } from './Test.svelte';
 
 	interface Car {
 		make: string;
@@ -34,20 +34,21 @@
 		];
 	}, 200);
 
-	let rowDataTwo: { name: string; age: number }[] = $state([
-		{ name: 'John', age: 25 },
-		{ name: 'Jane', age: 22 },
-		{ name: 'Joe', age: 30 }
+	let rowDataTwo: TestCustomCellData[] = $state([
+		{ name: 'John', desc: 'Desc1' },
+		{ name: 'Jane', desc: 'Desc2' },
+		{ name: 'Jack', desc: 'Desc3' }
 	]);
 
-	let gridOptionsTwo: GridOptions<{ name: string; age: number }> = $state({
+	let gridOptionsTwo: GridOptions<TestCustomCellData> = $state({
 		columnDefs: [
 			{ field: 'name' },
 			{
-				field: 'age',
+				field: 'desc',
 				cellRenderer: TestComp,
 				cellRendererParams: {
-					age: '35'
+					value: 'overriddenValue',
+					context: { someAdditionalContext: 'additionalContextData' } as TestCompContext
 				}
 			}
 		],
