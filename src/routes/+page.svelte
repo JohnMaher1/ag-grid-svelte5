@@ -4,6 +4,8 @@
 	import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 	import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 	import { themeQuartz } from '@ag-grid-community/theming';
+	import { TestComp } from './Test.svelte';
+
 	interface Car {
 		make: string;
 		model: string;
@@ -17,12 +19,7 @@
 		{ id: 3, make: 'Porsche', model: 'Boxster', price: 72000 }
 	]);
 	let gridOptions: GridOptions<Car> = $state({
-		columnDefs: [
-			{ field: 'id' },
-			{ field: 'make' },
-			{ field: 'model', rowGroup: true },
-			{ field: 'price' }
-		] as ColDef<Car>[],
+		columnDefs: [{ field: 'id' }, { field: 'make' }, { field: 'model' }, { field: 'price' }],
 		// Important for reducing dom updates and improving performance
 		getRowId: (params) => params.data.id.toString(),
 		domLayout: 'autoHeight',
@@ -37,10 +34,33 @@
 		];
 	}, 200);
 
+	let rowDataTwo: { name: string; age: number }[] = $state([
+		{ name: 'John', age: 25 },
+		{ name: 'Jane', age: 22 },
+		{ name: 'Joe', age: 30 }
+	]);
+
+	let gridOptionsTwo: GridOptions<{ name: string; age: number }> = $state({
+		columnDefs: [
+			{ field: 'name' },
+			{
+				field: 'age',
+				cellRenderer: TestComp,
+				cellRendererParams: {
+					age: '35'
+				}
+			}
+		],
+		// Important for reducing dom updates and improving performance
+		getRowId: (params) => params.data.name,
+		domLayout: 'autoHeight',
+		theme: themeQuartz
+	});
+
 	const modules: Module[] = [ClientSideRowModelModule, RowGroupingModule];
 
-	// to use myTheme in an application, pass it to the theme grid option
-	const myTheme = themeQuartz.withParams({
+	// to use themeOne in an application, pass it to the theme grid option
+	const themeOne = themeQuartz.withParams({
 		accentColor: '#EE28ED',
 		backgroundColor: '#1f2836',
 		browserColorScheme: 'dark',
@@ -53,27 +73,36 @@
 		headerFontSize: 14
 	});
 
-	const myTheme2 = themeQuartz.withParams({
+	const themeTwo = themeQuartz.withParams({
 		accentColor: '#33E34B',
-		backgroundColor: '#EC111C',
-		browserColorScheme: 'dark',
+		backgroundColor: '#b7b3b3',
+		browserColorScheme: 'light',
 		chromeBackgroundColor: {
 			ref: 'foregroundColor',
 			mix: 0.07,
 			onto: 'backgroundColor'
 		},
-		foregroundColor: '#FFF',
+		foregroundColor: '#000',
 		headerFontSize: 14
 	});
 
-	let selectedTheme = $state(myTheme);
+	let selectedTheme = $state(themeOne);
 
 	$inspect(selectedTheme);
 </script>
 
 <div>
-	<AgGridSvelte5Component {gridOptions} {rowData} theme={selectedTheme} {modules} />
-	<button onclick={() => (selectedTheme = selectedTheme === myTheme ? myTheme2 : myTheme)}
+	<button
+		style="margin-bottom: 8px;"
+		onclick={() => (selectedTheme = selectedTheme === themeOne ? themeTwo : themeOne)}
 		>Change Theme</button
 	>
+	<AgGridSvelte5Component {gridOptions} {rowData} theme={selectedTheme} {modules} />
+	<div style="height: 20px;"></div>
+	<AgGridSvelte5Component
+		gridOptions={gridOptionsTwo}
+		rowData={rowDataTwo}
+		theme={selectedTheme}
+		{modules}
+	/>
 </div>
