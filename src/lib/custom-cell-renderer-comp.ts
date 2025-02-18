@@ -33,6 +33,6 @@ export class SvelteRendererComp implements ICellRendererComp {
 	}
 
 	refresh(): boolean {
-		return true;
+		return false;
 	}
 }
