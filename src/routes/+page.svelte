@@ -1,4 +1,5 @@
 <script lang="ts" module>
+	// Types for the grids
 	export interface RowData1 {
 		make: string;
 		model: string;
@@ -19,9 +20,12 @@
 	import AgGridSvelte5Component from '$lib/AgGridComponent.svelte';
 	import { type GridOptions, type ColDef, type Module } from '@ag-grid-community/core';
 	import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-	import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 	import { themeQuartz } from '@ag-grid-community/theming';
 	import { ExampleCustomCellComp } from './ExampleCustomCell.svelte';
+
+	// ============================================================
+	// Example 1: Standard grid with custom theme and reactive data
+	// ============================================================
 
 	let rowData: RowData1[] = $state([
 		{ id: 1, make: 'Toyota', model: 'Celica', price: 35000 },
@@ -36,6 +40,7 @@
 		theme: themeQuartz
 	});
 
+	// Simple change detection to show reactivity
 	setInterval(() => {
 		rowData = [
 			{ id: 1, make: 'Ford', model: 'Mondeo', price: 32000 },
@@ -43,6 +48,10 @@
 			{ id: 3, make: 'Porsche', model: 'Boxster', price: rowData[2].price + 1 }
 		];
 	}, 1000);
+
+	// ============================================================
+	// Example 2: Grid with custom cell renderer (Svelte component)
+	// ============================================================
 
 	let rowDataTwo: RowData2[] = $state([
 		{ name: 'John', desc: 'Desc1' },
@@ -55,20 +64,19 @@
 			{ field: 'name' },
 			{
 				field: 'desc',
-				cellRenderer: ExampleCustomCellComp,
+				cellRenderer: ExampleCustomCellComp, // Class that extends SvelteRendererComp, see ExampleCustomCell.svelte
 				cellRendererParams: {
 					value: 'overriddenValue', // E.g. override the default value
-					context: { someAdditionalContext: 'additionalContextData' } as RowData2Context // Add extra custom context if needed
+					context: { someAdditionalContext: 'additionalContextData' } as RowData2Context // Add context if needed
 				}
 			}
 		],
-		// Important for reducing dom updates and improving performance
 		getRowId: (params) => params.data.name,
 		domLayout: 'autoHeight',
 		theme: themeQuartz
 	});
 
-	const modules: Module[] = [ClientSideRowModelModule, RowGroupingModule];
+	const modules: Module[] = [ClientSideRowModelModule];
 
 	// to use themeOne in an application, pass it to the theme grid option
 	const themeOne = themeQuartz.withParams({

@@ -1,5 +1,5 @@
 <script module>
-	import { SvelteRendererComp } from '$lib/helpers.svelte.js';
+	import { SvelteRendererComp } from '$lib/custom-cell-renderer-comp.js';
 	import type { ICellRendererParams } from '@ag-grid-community/core';
 	import { mount } from 'svelte';
 	import Test from './ExampleCustomCell.svelte';

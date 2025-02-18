@@ -1,5 +1,5 @@
 import type { ICellRendererComp, ICellRendererParams } from '@ag-grid-community/core';
-import { mount, unmount, type Component } from 'svelte';
+import { unmount } from 'svelte';
 
 export class SvelteRendererComp implements ICellRendererComp {
 	public eGui: HTMLElement | undefined;
