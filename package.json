@@ -1,11 +1,17 @@
 {
 	"name": "ag-grid-svelte5",
-	"version": "0.0.82",
+	"version": "1.0.0",
 	"keywords": [
 		"svelte",
 		"ag-grid",
 		"wrapper",
-		"svelte5"
+		"svelte5",
+		"ag grid",
+		"custom cell",
+		"svelte 5",
+		"ag-grid-svelte5",
+		"ag-grid-svelte",
+		"ag grid svelte"
 	],
 	"license": "MIT",
 	"scripts": {
