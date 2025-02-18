@@ -1,24 +1,34 @@
+<script lang="ts" module>
+	export interface RowData1 {
+		make: string;
+		model: string;
+		price: number;
+		id: number;
+	}
+	export interface RowData2 {
+		name: string;
+		desc: string;
+	}
+
+	export interface RowData2Context {
+		someAdditionalContext: string;
+	}
+</script>
+
 <script lang="ts">
 	import AgGridSvelte5Component from '$lib/AgGridComponent.svelte';
 	import { type GridOptions, type ColDef, type Module } from '@ag-grid-community/core';
 	import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 	import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 	import { themeQuartz } from '@ag-grid-community/theming';
-	import { TestComp, type TestCompContext, type TestCustomCellData } from './Test.svelte';
+	import { ExampleCustomCellComp } from './ExampleCustomCell.svelte';
 
-	interface Car {
-		make: string;
-		model: string;
-		price: number;
-		id: number;
-	}
-
-	let rowData: Car[] = $state([
+	let rowData: RowData1[] = $state([
 		{ id: 1, make: 'Toyota', model: 'Celica', price: 35000 },
 		{ id: 2, make: 'Ford', model: 'Mondeo', price: 32000 },
 		{ id: 3, make: 'Porsche', model: 'Boxster', price: 72000 }
 	]);
-	let gridOptions: GridOptions<Car> = $state({
+	let gridOptions: GridOptions<RowData1> = $state({
 		columnDefs: [{ field: 'id' }, { field: 'make' }, { field: 'model' }, { field: 'price' }],
 		// Important for reducing dom updates and improving performance
 		getRowId: (params) => params.data.id.toString(),
@@ -32,23 +42,23 @@
 			{ id: 2, make: 'Toyota', model: 'Celica', price: 35000 },
 			{ id: 3, make: 'Porsche', model: 'Boxster', price: rowData[2].price + 1 }
 		];
-	}, 200);
+	}, 1000);
 
-	let rowDataTwo: TestCustomCellData[] = $state([
+	let rowDataTwo: RowData2[] = $state([
 		{ name: 'John', desc: 'Desc1' },
 		{ name: 'Jane', desc: 'Desc2' },
 		{ name: 'Jack', desc: 'Desc3' }
 	]);
 
-	let gridOptionsTwo: GridOptions<TestCustomCellData> = $state({
+	let gridOptionsTwo: GridOptions<RowData2> = $state({
 		columnDefs: [
 			{ field: 'name' },
 			{
 				field: 'desc',
-				cellRenderer: TestComp,
+				cellRenderer: ExampleCustomCellComp,
 				cellRendererParams: {
-					value: 'overriddenValue',
-					context: { someAdditionalContext: 'additionalContextData' } as TestCompContext
+					value: 'overriddenValue', // E.g. override the default value
+					context: { someAdditionalContext: 'additionalContextData' } as RowData2Context // Add extra custom context if needed
 				}
 			}
 		],
@@ -88,8 +98,6 @@
 	});
 
 	let selectedTheme = $state(themeOne);
-
-	$inspect(selectedTheme);
 </script>
 
 <div>
