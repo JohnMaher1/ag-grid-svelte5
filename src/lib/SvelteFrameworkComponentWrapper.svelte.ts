@@ -25,19 +25,16 @@ export class SvelteFrameworkOverrides implements IFrameworkOverrides {
 		callback,
 		source
 	) => {
-		// Implement any specific logic needed for incoming callbacks
 		return callback();
 	};
 
 	wrapOutgoing: <T>(callback: () => T) => T = (callback) => {
-		// Implement any specific logic needed for outgoing callbacks
 		return callback();
 	};
 
 	shouldWrapOutgoing?: boolean | undefined = false;
 
 	frameworkComponent(name: string, components?: any) {
-		// Implement logic to return the framework component
 		if (components && components[name]) {
 			return components[name];
 		}
@@ -66,7 +63,6 @@ export class SvelteFrameworkOverrides implements IFrameworkOverrides {
 	}
 
 	isFrameworkComponent(comp: any): boolean {
-		// Implement logic to determine if the component is a framework component
 		return !!comp && typeof comp === 'object' && 'render' in comp;
 	}
 }

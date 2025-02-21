@@ -5,19 +5,55 @@ A Svelte component for integrating AG Grid with Svelte 5
 ## Installation
 
 ```bash
-npm install ag-grid-svelte5
+npm i ag-grid-svelte5
+pnpm i ag-grid-svelte5
+bun install ag-grid-svelte5
+yarn install ag-grid-svelte5
 ```
 
-## Main Features
+# Table of contents
+
+1. [Main Features](#mainfeatures)
+2. [How this Library Works](#works)
+   1. [Overview](#worksoverview)
+   2. [Custom Cells](#workscells)
+3. [Examples](#examples)
+   1. [Standard](#example1)
+   2. [Custom Cell](#example2)
+   3. [Custom Theme](#example3)
+4. [General and Contact](#general)
+
+## Main Features <a name="mainfeatures"></a>
 
 - Create custom cells with Svelte components 🚀
 - Create various themes that will auto-update when changed 🎟
 - Fully Svelte 5 Compatible 💨
-- Please visit the [repo](https://github.com/JohnMaher1/ag-grid-svelte5) for demo usage 💡
+- Please visit the [GitHub](https://github.com/JohnMaher1/ag-grid-svelte5) for demo usage 💡
 
-## Examples
+### How this library works <a name="works"></a>
 
-### Standard Grid with custom theme and reactive data
+#### Overview <a name="worksoverview"></a>
+
+This library creates a Svelte component based on the Javascript version of AG Grid. The svelte component contains a div component where the grid is placed and has an internal reference to the grid api returned from ag grids `createGrid` function. To render the grid inside this svelte component overrides are required to tell the grid we are using a framework to render the grid.
+
+#### Custom Cells <a name="workscells"></a>
+
+AG Grid provides 2 main ways to render a custom cell.
+
+1. A function which the gui element (e.g. a div containing your cell data)
+2. A class that implements `ICellRendererComp`
+
+The first instance only returns a gui element which will not work to render our custom svelte component and its required props.
+
+The second instance is what this library uses. This library exports the class `AgGridSvelteRendererComp` which implements AG Grids `ICellRendererComp`. This class contains the methods required to render the svelte component, pass the required parameters, and cleanup the component once its deleted. The main functions are `init` to setup the parameters and `render` which simply calls Svelte's `mount` function to mount/render the component.
+
+Because a component cannot be passed in as a generic type to a class. A 'hack' is used to carry some of the weight in `cellRendererParams` which includes the component instance and the props to be passed.
+
+I would strongly advise looking into the documentation for AG Grid particulary around custom components if this is something you are interested in. There are many cases where the generic `AgGridSvelteRendererComp` may not meet your needs, so it may be recommened to create your own class that implements ` ICellRendererComp`. E.g. a different `refresh` function which only refreshes the cell when `x` value changes.
+
+## Examples <a name="examples"></a>
+
+### Standard Grid with custom theme and reactive data <a name="example1"></a>
 
 ```svelte
 <script lang="ts">
@@ -47,7 +83,7 @@ npm install ag-grid-svelte5
 <AgGridSvelte5Component {gridOptions} {rowData} theme={selectedTheme} {modules} />
 ```
 
-### Custom Cell Renderer
+### Custom Cell Renderer <a name="example2"></a>
 
 #### Main Svelte Component
 
@@ -63,12 +99,23 @@ npm install ag-grid-svelte5
 		columnDefs: [
 			{ field: 'name' },
 			{
-				field: 'desc',
-				cellRenderer: ExampleCustomCellComp, // Class that extends SvelteRendererComp, see ExampleCustomCell.svelte
-				cellRendererParams: {
-					value: 'overriddenValue', // E.g. override the default value
-					context: { someAdditionalContext: 'additionalContextData' } as RowData2Context // Add context if needed
-				}
+    			field: 'desc',
+    			// Important: Both cellRenderer AND cellRendererParams is required
+    			cellRenderer: AgGridSvelteRendererComp,
+    			cellRendererParams: (params: ExampleCellProps) => {
+    				// (Optional): Add a custom prop to the cell renderer alongside ag grids params
+    				params.additionalProp1 = 'Hello there';
+    				// (Optional) Add additional context to the cell renderer
+    				params.context = {
+    					someAdditionalContext: 'Some additional context'
+    				};
+    				// Required: Return the cell renderer params including the component to render
+    				const cell: AgGridSvelteRendererParams<ExampleCellProps> = {
+    					component: ExampleCustomCell, // .svelte component
+    					...params // .svelte component props which extend ICellRendererParams
+    				};
+    				return cell;
+    			}
 			}
 		],
 		getRowId: (params) => params.data.name,
@@ -85,36 +132,27 @@ npm install ag-grid-svelte5
     />
 ```
 
-#### Custom Cell Svelte Component
-
 ```
-<script lang="ts" module>
-    // All functions and properties can be overriden in this class
-    // SvelteRendererComp implements ICellRendererComp from AG Grid
-    // Visit the AG Grid docs you would like to customise this more!
-    export class ExampleCustomCellComp extends SvelteRendererComp {
-    	render() {
-    		// Unmount is handled is base class.
-    		this.comp = mount(Test, {
-    			target: this.eGui!,
-    			props: this.params
-    		});
-    	}
-    }
+<script module>
+	import type { RowData2, RowData2Context } from './+page.svelte';
+	import type { ICellRendererParams } from '@ag-grid-community/core';
+
+	export interface ExampleCellProps extends ICellRendererParams<RowData2, string, RowData2Context> {
+		// (Optional) Add additional props here
+		additionalProp1: string;
+	}
 </script>
 
 <script lang="ts">
-	let props: ICellRendererParams<RowData2, string, RowData2Context> = $props();
+	let props: ExampleCellProps = $props();
 </script>
 
-
-
-<div>
-	Name: {props.data?.name}, Desc: {props.value}, Context: {props.context.someAdditionalContext}
+<div style="overflow-x: auto;">
+	This is an additional prop: '{props.additionalProp1}'. This is a standard ag grid prop: '{props.data?.name}'. This is a context prop: '{props.context?.someAdditionalContext}'.
 </div>
 ```
 
-### Custom themes
+### Custom themes <a name="example3"></a>
 
 ```
 <script lang="ts">
@@ -163,3 +201,9 @@ npm install ag-grid-svelte5
 
 </div>
 ```
+
+#### General and Contact <a name="general"></a>
+
+If you have any suggestions/feedback it would be greatly appreciated. Please visit the [GitHub](https://github.com/JohnMaher1/ag-grid-svelte5) to raise any issues or possible changes!
+
+If you would like to contact me. Here is my [website/portfolio]("https://www.john-maher.dev/") with contact information.

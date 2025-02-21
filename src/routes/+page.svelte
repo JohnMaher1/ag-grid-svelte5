@@ -21,7 +21,11 @@
 	import { type GridOptions, type ColDef, type Module } from '@ag-grid-community/core';
 	import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 	import { themeQuartz } from '@ag-grid-community/theming';
-	import { ExampleCustomCellComp } from './ExampleCustomCell.svelte';
+	import ExampleCustomCell, { type ExampleCellProps } from './ExampleCustomCell.svelte';
+	import {
+		AgGridSvelteRendererComp,
+		type AgGridSvelteRendererParams
+	} from '$lib/custom-cell-renderer-comp.js';
 
 	// ============================================================
 	// Example 1: Standard grid with custom theme and reactive data
@@ -64,10 +68,20 @@
 			{ field: 'name' },
 			{
 				field: 'desc',
-				cellRenderer: ExampleCustomCellComp, // Class that extends SvelteRendererComp, see ExampleCustomCell.svelte
-				cellRendererParams: {
-					value: 'overriddenValue', // E.g. override the default value
-					context: { someAdditionalContext: 'additionalContextData' } as RowData2Context // Add context if needed
+				cellRenderer: AgGridSvelteRendererComp,
+				cellRendererParams: (params: ExampleCellProps) => {
+					// (Optional): Add a custom prop to the cell renderer alongside ag grids params
+					params.additionalProp1 = 'Hello there';
+					// (Optional) Add additional context to the cell renderer
+					params.context = {
+						someAdditionalContext: 'Some additional context'
+					};
+					// Required: Return the cell renderer params including the component to render
+					const cell: AgGridSvelteRendererParams<ExampleCellProps> = {
+						component: ExampleCustomCell, // .svelte component
+						...params // .svelte component props which extend ICellRendererParams
+					};
+					return cell;
 				}
 			}
 		],

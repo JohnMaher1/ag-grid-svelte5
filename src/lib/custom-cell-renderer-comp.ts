@@ -1,21 +1,28 @@
 import type { ICellRendererComp, ICellRendererParams } from '@ag-grid-community/core';
-import { unmount } from 'svelte';
+import { unmount, type Component, mount } from 'svelte';
 
-export class SvelteRendererComp implements ICellRendererComp {
+export interface AgGridSvelteRendererParams<T extends Record<string, any>>
+	extends ICellRendererParams {
+	component: Component<T>;
+}
+
+export class AgGridSvelteRendererComp<T extends Record<string, any> & ICellRendererParams>
+	implements ICellRendererComp
+{
 	public eGui: HTMLElement | undefined;
 	public comp: Record<string, any> | undefined = undefined;
-	public params: ICellRendererParams = {} as ICellRendererParams;
-	public props: Record<string, any> = {};
 
-	init(params: ICellRendererParams): void {
+	init(params: AgGridSvelteRendererParams<T>): void {
 		this.eGui = document.createElement('div');
-		this.params = params;
 		this.eGui.style.height = '100%';
-		this.render();
+		this.render(params.component, params);
 	}
 
-	render() {
-		throw new Error('Subclass must implement render method');
+	render(component: Component<T>, props: AgGridSvelteRendererParams<T>) {
+		this.comp = mount(component, {
+			target: this.eGui!,
+			props: props as unknown as T
+		});
 	}
 
 	getGui() {
