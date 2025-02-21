@@ -206,4 +206,4 @@ I would strongly advise looking into the documentation for AG Grid particulary a
 
 If you have any suggestions/feedback it would be greatly appreciated. Please visit the [GitHub](https://github.com/JohnMaher1/ag-grid-svelte5) to raise any issues or possible changes!
 
-If you would like to contact me. Here is my [website/portfolio]("https://www.john-maher.dev/") with contact information.
+If you would like to contact me. Here is my website: https://www.john-maher.dev with contact information.
