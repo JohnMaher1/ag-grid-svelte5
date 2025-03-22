@@ -40,7 +40,7 @@ This library creates a Svelte component based on the Javascript version of AG Gr
 
 AG Grid provides 2 main ways to render a custom cell.
 
-1. A function which the gui element (e.g. a div containing your cell data)
+1. A function which returns a gui element (e.g. a div containing your cell data)
 2. A class that implements `ICellRendererComp`
 
 The first instance only returns a gui element which will not work to render our custom svelte component and its required props.
